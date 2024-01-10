@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:01:09 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/01/09 18:04:49 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/01/10 19:09:04 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # define CYAN "\033[1;36m"
 
 # include <iostream>
+# include <iomanip>
 # include <fstream>
 # include <sstream>
 # include <algorithm>
@@ -26,25 +27,18 @@
 
 class BitcoinExchange {
     private:
-    public:
+        std::map<std::string, double> _rates;
         BitcoinExchange();
+    public:
+        BitcoinExchange(std::map<std::string, double> rates);
         BitcoinExchange(const BitcoinExchange &other);
         BitcoinExchange &operator=(const BitcoinExchange &other);
         ~BitcoinExchange();
-        void readRates(std::string filename, std::map<std::string, float> &rates);
+        
+        bool checkDate(const std::string &date);
+        void readRates(std::string filename, std::map<std::string, double> &rates);
         std::map<std::string, float> getInput(std::string filename);
         void checkInput(std::map<std::string, float> &map);
 };
-
-// class Input {
-//     private:
-//     public:
-//         Input();
-//         Input(const Input &other);
-//         Input &operator=(const Input &other);
-//         ~Input();
-//         std::map<std::string, float> getInput(std::string filename);
-//         void checkInput(std::map<std::string, float> &map);
-// };
 
 #endif

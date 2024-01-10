@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:02:25 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/01/09 17:45:52 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/01/10 18:42:08 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,11 @@ int main(int argc, char **argv)
     //     std::cout << RED << "Error: " << RESET << "could not open file." << std::endl;
     //     return 1;
     // }
-    BitcoinExchange exchange;
-    std::map<std::string, float> rates;
+    std::map<std::string, double> rates;
+    BitcoinExchange exchange(rates);
     exchange.readRates("data.csv", rates);
-    for (std::map<std::string, float>::iterator it = rates.begin(); it != rates.end(); ++it) {
-        std::cout << it->first << " " << it->second << std::endl;
+    for (std::map<std::string, double>::iterator it = rates.begin(); it != rates.end(); ++it) {
+        std::cout << it->first << " " << std::fixed << std::setprecision(2) << it->second << std::endl;
     }
     // if (rates.find(date) != rates.end()) {
     //     std::cout << "Rate for " << date << ": " << rates[date] << std::endl;

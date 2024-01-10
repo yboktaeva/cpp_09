@@ -6,28 +6,37 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:02:08 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/01/09 17:45:29 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/01/10 19:09:12 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
 
-BitcoinExchange::BitcoinExchange() {}
+BitcoinExchange::BitcoinExchange() : _rates() {}
+
+BitcoinExchange::BitcoinExchange(std::map<std::string, double> rates) : _rates(rates) {}
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &other) {
-    *this = other;
+    _rates = other._rates;
 }
 
 BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other) {
-    if (this != &other)
-        *this = other;
+    if (this == &other)
+        return (*this);
+    _rates = other._rates;
     return (*this);
 }
 
 BitcoinExchange::~BitcoinExchange() {}
 
-void BitcoinExchange::readRates(std::string filename, std::map<std::string, float> &rates) {
+bool BitcoinExchange::checkDate(const std::string &date) {
     
+    
+}
+
+void BitcoinExchange::readRates(std::string filename, std::map<std::string, double> &rates) {
+    double rate;
+    char *end;
     std::ifstream ifs(filename.c_str());
     if (!ifs.is_open()) {
         std::cout << RED << "Error: " << RESET << "could not open file for read or file does not exist."  << std::endl;
@@ -38,9 +47,10 @@ void BitcoinExchange::readRates(std::string filename, std::map<std::string, floa
         std::stringstream ss(line);
         std::string date;
         std::getline(ss, date, ',');
-        float rate;
-        ss >> rate;
-        rates.insert(std::pair<std::string, float>(date, rate));
+        std::string str;
+        ss >> str;
+        rate = strtod(str.c_str(), &end);
+        rates[date] = rate;
     }
     ifs.close();
 }
