@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:01:09 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/01/10 19:09:04 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/01/31 16:39:20 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,11 @@ class BitcoinExchange {
         BitcoinExchange &operator=(const BitcoinExchange &other);
         ~BitcoinExchange();
         
-        bool checkDate(const std::string &date);
+        std::map<std::string, double> getRates() const;
         void readRates(std::string filename, std::map<std::string, double> &rates);
-        std::map<std::string, float> getInput(std::string filename);
-        void checkInput(std::map<std::string, float> &map);
+        std::string checkDate(std::stringstream &ss);
+        double checkValue(std::stringstream &ss);
+        void printResult(std::string filename);
 };
 
 #endif
