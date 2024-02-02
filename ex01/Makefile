@@ -6,7 +6,7 @@
 #    By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/08 09:54:41 by yuboktae          #+#    #+#              #
-#    Updated: 2024/01/08 09:59:22 by yuboktae         ###   ########.fr        #
+#    Updated: 2024/02/02 18:34:58 by yuboktae         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ SRC_DIR = src/
 OBJ_DIR = obj/
 INC_DIR = includes/
 
-SRC_FILES = main.cpp
+SRC_FILES = main.cpp RPN.cpp
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
