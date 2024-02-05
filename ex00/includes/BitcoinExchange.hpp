@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:01:09 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/02 16:19:44 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/05 16:55:54 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <algorithm>
 # include <exception>
 # include <map>
+# include <cmath>
 
 class BitcoinExchange {
     private:

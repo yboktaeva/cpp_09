@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:02:08 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/01 15:45:40 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/05 16:54:32 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,9 @@ double  BitcoinExchange::checkValue(std::stringstream &ss) {
     value = strtod(str.c_str(), NULL);
     if (value < 0) {
         throw std::runtime_error("not a positive number.");
+    }
+    else if (value == NAN || value == INFINITY || value == -INFINITY) {
+        throw std::runtime_error("not a number.");
     }
     else if (value > 1001) {
         throw std::runtime_error("too large number.");
