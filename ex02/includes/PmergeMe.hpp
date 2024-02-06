@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 16:11:46 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/05 19:10:29 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/06 17:22:31 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,30 +28,61 @@
 # define CYAN "\033[1;36m"
 # define RESET "\033[0m"
 
-template <typename T>
 class   PmergeMe {
     public:
-        PmergeMe(const std::vector<int> &vec) : container(vec.begin(), vec.end()) {};
-        PmergeMe(const std::list<int> &lst) : container(lst.begin(), lst.end()) {};
-        PmergeMe(const PmergeMe &src) : container(src.container) {};
-        PmergeMe &operator=(const PmergeMe &src) {
-            if (this == &src)
-                return (*this);
-            container = src.container;
-            return (*this);
-        }
+        PmergeMe();
+        PmergeMe(const PmergeMe &src);
+        PmergeMe &operator=(const PmergeMe &src);
+        ~PmergeMe();
         
-        ~PmergeMe() {};
+        class PmergeMeVector {
+            public:
+                PmergeMeVector();
+                PmergeMeVector(const PmergeMeVector &src);
+                PmergeMeVector &operator=(const PmergeMeVector &src);
+                ~PmergeMeVector();
+                
+                void    getVectorFromInput(char **argv);
+                void    makePairsVector();
+                void    mergeSortPairs(std::vector<std::pair<int, int> >& vec, int start, int end); //recursive
+                void    getMainAndPendChain();
+                std::vector<int>     getJacobsthalSequence(int n);
+                void    binarySearchVector();
+                void    insertInMainChain(int n);
+                void    mergeInsertionSortVector(char **argv);
+            private:
+                std::vector<int>    _pmVector;
+                std::vector<std::pair<int, int> >    _pairsVector;
+                std::vector<int>    _mainChainVector;
+                std::vector<int>    _pendChainVector;
+                int     _straggler;
+        };
         
-        void    sortInsidePairs(); //sorts each pair of elements
-        void    mergeSortPairs();
-        void    createMainChain();
-        void    createPendElements();
-        void    binaryInsertionSort();
-        void    mergeInsertionSort();
-    private:
-        T   container;
-        PmergeMe(); // private default constructor for cannonical form
+        class PmergeMeList {
+            public:
+                PmergeMeList();
+                PmergeMeList(const PmergeMeList &src);
+                PmergeMeList &operator=(const PmergeMeList &src);
+                ~PmergeMeList();
+
+                void    getListFromInput(char **argv);
+                void    makePairsList();
+                void    mergeSortPairs(std::list<std::pair<int, int> >& lst, std::list<std::pair<int, int> >::iterator begin,
+                    std::list<std::pair<int, int> >::iterator end); //recursive
+                void    getMainAndPendChain();
+                int     getJacobsthalNumber(int n);
+                void    binarySearchList();
+                void    insertInMainChain(int n);
+                void    mergeInsertionSortList(char **argv);
+            private:
+                std::list<int>    _pmList;
+                std::list<std::pair<int, int> >    _pairsList;
+                std::list<int>    _mainChainList;
+                std::list<int>    _pendChainList;
+                int     _straggler;
+        };
+        
+        
 };
 
 template <typename It> 
@@ -61,11 +92,6 @@ void    print(It begin, It end) {
         begin++;
     }
     std::cout << std::endl;
-};
-
-template <typename ContainerType, typename ItemType>
-void    pushback(ConatinerType& container, const ItemType& item) {
-    container.push_back(item);
 };
 
 #endif

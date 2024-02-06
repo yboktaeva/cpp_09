@@ -6,7 +6,7 @@
 #    By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/08 09:55:08 by yuboktae          #+#    #+#              #
-#    Updated: 2024/02/02 16:15:19 by yuboktae         ###   ########.fr        #
+#    Updated: 2024/02/06 14:03:38 by yuboktae         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ SRC_DIR = src/
 OBJ_DIR = obj/
 INC_DIR = includes/
 
-SRC_FILES = main.cpp PmergeMe.cpp
+SRC_FILES = main.cpp PmergeMe.cpp PmergeMeVector.cpp PmergeMeList.cpp
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
