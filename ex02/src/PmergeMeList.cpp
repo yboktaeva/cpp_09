@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:03:23 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/06 17:28:12 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/07 12:33:31 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ PmergeMe::PmergeMeList::PmergeMeList(const PmergeMeList &src) {
 PmergeMe::PmergeMeList &PmergeMe::PmergeMeList::operator=(const PmergeMeList &src) {
     if (this == &src)
         return (*this);
-    return (*this);
+    return(*this);
 }
 
 PmergeMe::PmergeMeList::~PmergeMeList() {}
@@ -42,22 +42,10 @@ PmergeMe::PmergeMeList::~PmergeMeList() {}
 void    PmergeMe::PmergeMeList::getListFromInput(char **argv) {
     try {
         for (size_t i = 1; argv[i] != NULL; i++) {
-            bool is_digit = true;
-            for (size_t j = 0; argv[i][j] != '\0'; j++) {
-                if (!isdigit(argv[i][j])) {
-                    is_digit = false;
-                    break;
-                }
-            }
-            if (!is_digit) {
-                throw std::invalid_argument("argument is not a number");
-            }
-            int num = std::atoi(argv[i]);
-            if (num < 0) {
-                throw std::invalid_argument("only positive integers are allowed");
-            } 
-            if (num > INT_MAX) {
-                throw std::out_of_range("number is too big");
+            char *end;
+            int num = std::strtol(argv[i], &end, 10);
+            if (*end != '\0' || num < 0) {
+                throw std::invalid_argument("out of range or not a number");
             }
             _pmList.push_back(num);
         }
@@ -127,6 +115,25 @@ int     PmergeMe::PmergeMeList::getJacobsthalNumber(int n) {
         return (1);
     }
     return (getJacobsthalNumber(n - 1) + 2 * getJacobsthalNumber(n - 2));
+}
+
+int     PmergeMe::PmergeMeList::binarySearchList(std::list<int> &lst, int target) {
+    std::list<int>::iterator it = lst.begin();
+    int start = 0;
+    int end = lst.size() - 1;
+    while (start <= end) {
+        int mid = start + (end - start) / 2;
+        std::advance(it, mid);
+        if (*it == target) {
+            return (mid);
+        }
+        if (*it < target) {
+            start = mid + 1;
+        } else {
+            end = mid - 1;
+        }
+    }
+    return (start);
 }
 
 void    PmergeMe::PmergeMeList::mergeInsertionSortList(char **argv) {

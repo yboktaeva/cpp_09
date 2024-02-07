@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 16:11:46 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/06 17:22:31 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/07 14:24:37 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ class   PmergeMe {
                 void    mergeSortPairs(std::vector<std::pair<int, int> >& vec, int start, int end); //recursive
                 void    getMainAndPendChain();
                 std::vector<int>     getJacobsthalSequence(int n);
-                void    binarySearchVector();
-                void    insertInMainChain(int n);
+                int     binarySearchVector(std::vector<int>& vec, int target);
+                void    insertInMainChain();
                 void    mergeInsertionSortVector(char **argv);
             private:
                 std::vector<int>    _pmVector;
@@ -71,7 +71,7 @@ class   PmergeMe {
                     std::list<std::pair<int, int> >::iterator end); //recursive
                 void    getMainAndPendChain();
                 int     getJacobsthalNumber(int n);
-                void    binarySearchList();
+                int     binarySearchList(std::list<int>& lst, int target);
                 void    insertInMainChain(int n);
                 void    mergeInsertionSortList(char **argv);
             private:

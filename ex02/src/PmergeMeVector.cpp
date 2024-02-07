@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:02:02 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/06 17:41:20 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/07 17:13:56 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,35 +73,35 @@ void    PmergeMe::PmergeMeVector::makePairsVector() {
 }
 
 void    PmergeMe::PmergeMeVector::mergeSortPairs(std::vector<std::pair<int, int> >& vec, int start, int end) {
-    if (start >= end) {
+    if (start >= end) { // if the array is empty or has only one element, return
         return;
     }
-    int mid = start + (end - start) / 2;
-    mergeSortPairs(vec, start, mid);
-    mergeSortPairs(vec, mid + 1, end);
+    int mid = start + (end - start) / 2; // find the middle index
+    mergeSortPairs(vec, start, mid); // sort the left half
+    mergeSortPairs(vec, mid + 1, end); // sort the right half
     
     std::vector<std::pair<int, int> > merged;
     int left = start;
-    int right = mid + 1;
-    while (left <= mid && right <= end) {
-        if (vec[left].second < vec[right].second) {
+    int right = mid + 1; 
+    while (left <= mid && right <= end) { // merge the two halves
+        if (vec[left].second < vec[right].second) { // if left is smaller than right, push left
             merged.push_back(vec[left]);
             left++;
         } 
-        else {
+        else { // if right is smaller than left, push right
             merged.push_back(vec[right]);
             right++;
         }
     }
-    while (left <= mid) {
+    while (left <= mid) { // if there are any remaining elements in the left half, push them
         merged.push_back(vec[left]);
         left++;
     }
-    while (right <= end) {
+    while (right <= end) { // if there are any remaining elements in the right half, push them
         merged.push_back(vec[right]);
         right++;
     }
-    std::copy(merged.begin(), merged.end(), vec.begin() + start);
+    std::copy(merged.begin(), merged.end(), vec.begin() + start); // copy the merged vector to the original vector
 }
 
 void    PmergeMe::PmergeMeVector::getMainAndPendChain() {
@@ -118,21 +118,55 @@ std::vector<int>     PmergeMe::PmergeMeVector::getJacobsthalSequence(int n) {
     std::vector<int> jacobsthalSeq(n + 1);
     jacobsthalSeq[0] = 0;
     jacobsthalSeq[1] = 1;
-    for (int i = 2; i <= n; i++) {
+    for (int i = 3; i <= n; i++) {
         jacobsthalSeq[i] = jacobsthalSeq[i - 1] + 2 * jacobsthalSeq[i - 2];
     }
     return (jacobsthalSeq);
 }
 
-void    PmergeMe::PmergeMeVector::binarySearchVector() {
-    
+int    PmergeMe::PmergeMeVector::binarySearchVector(std::vector<int>& vec, int target) {
+    int left = 0;
+    int right = vec.size() - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (vec[mid] == target) {
+            return (mid);
+        }
+        if (vec[mid] < target) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+    return (left);
+}
+
+void    PmergeMe::PmergeMeVector::insertInMainChain() {
+    std::vector<int> jacobsthalSequence = getJacobsthalSequence(_pendChainVector.size());
+    std::cout << "Jacobsthal Sequence: ";
+    print(jacobsthalSequence.begin(), jacobsthalSequence.end());
+    for (size_t i = 0; i < jacobsthalSequence.size(); ++i) {
+        size_t index = jacobsthalSequence[i];
+        //std::cout << "Index: " << index << std::endl;
+        if (index < _pendChainVector.size()) {
+            int target = _pendChainVector[index];
+            int insertIndex = binarySearchVector(_mainChainVector, target);
+            _mainChainVector.insert(_mainChainVector.begin() + insertIndex, target);
+            //std::cout << "Inserting " << target << " at insertIndex " << insertIndex << std::endl;
+            _pendChainVector.erase(_pendChainVector.begin() + index);
+        }
+    }
 }
 
 void    PmergeMe::PmergeMeVector::mergeInsertionSortVector(char **argv) {
     getVectorFromInput(argv);
     if (_pmVector.size() < 2) {
-        return;
+        throw std::invalid_argument("Not enough elements to sort");
     }
+    // std::cout << "Before:  ";
+    // print(_pmVector.begin(), _pmVector.end());
     if (_pmVector.size() % 2 != 0) {
         _straggler = _pmVector.back();
         _pmVector.pop_back();
@@ -140,7 +174,13 @@ void    PmergeMe::PmergeMeVector::mergeInsertionSortVector(char **argv) {
     makePairsVector();
     mergeSortPairs(_pairsVector, 0, _pairsVector.size() - 1);
     getMainAndPendChain();
-    // print(_mainChainVector.begin(), _mainChainVector.end());
-    // std::cout << "=========" << std::endl;
-    // print(_pendChainVector.begin(), _pendChainVector.end());
+    //std::cout << "=========" << std::endl;
+    //std::cout << "Main:  ";
+    //print(_mainChainVector.begin(), _mainChainVector.end());
+    //std::cout << "Pending:  ";
+    //print(_pendChainVector.begin(), _pendChainVector.end());
+    insertInMainChain();
+    //std::cout << "=========" << std::endl;
+    std::cout << "After:  ";
+    print(_mainChainVector.begin(), _mainChainVector.end());
 }
