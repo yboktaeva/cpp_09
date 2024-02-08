@@ -6,7 +6,7 @@
 #    By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/08 09:55:08 by yuboktae          #+#    #+#              #
-#    Updated: 2024/02/06 14:03:38 by yuboktae         ###   ########.fr        #
+#    Updated: 2024/02/08 18:20:41 by yuboktae         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
 
 RM = rm -f
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 CPPFLAGS = -I/usr/local/includes -I$(INC_DIR)
 
 all: $(NAME)

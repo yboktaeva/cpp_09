@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:02:02 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/07 17:13:56 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/08 19:26:39 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,16 +114,6 @@ void    PmergeMe::PmergeMeVector::getMainAndPendChain() {
     }
 }
 
-std::vector<int>     PmergeMe::PmergeMeVector::getJacobsthalSequence(int n) {
-    std::vector<int> jacobsthalSeq(n + 1);
-    jacobsthalSeq[0] = 0;
-    jacobsthalSeq[1] = 1;
-    for (int i = 3; i <= n; i++) {
-        jacobsthalSeq[i] = jacobsthalSeq[i - 1] + 2 * jacobsthalSeq[i - 2];
-    }
-    return (jacobsthalSeq);
-}
-
 int    PmergeMe::PmergeMeVector::binarySearchVector(std::vector<int>& vec, int target) {
     int left = 0;
     int right = vec.size() - 1;
@@ -143,30 +133,42 @@ int    PmergeMe::PmergeMeVector::binarySearchVector(std::vector<int>& vec, int t
     return (left);
 }
 
+std::vector<int>     PmergeMe::PmergeMeVector::getJacobsthalSequence(int n) {
+    std::vector<int> jacobsthalSeq(n);
+    jacobsthalSeq[0] = 1;
+    jacobsthalSeq[1] = 3;
+    for (int i = 2; i < n; i++) {
+        jacobsthalSeq[i] = jacobsthalSeq[i - 1] + 2 * jacobsthalSeq[i - 2];
+        // if (jacobsthalSeq[i] > n * 2) {
+        //     jacobsthalSeq.resize(i);
+        //     break;
+        // }
+    }
+    
+    return (jacobsthalSeq);
+}
+
 void    PmergeMe::PmergeMeVector::insertInMainChain() {
     std::vector<int> jacobsthalSequence = getJacobsthalSequence(_pendChainVector.size());
-    std::cout << "Jacobsthal Sequence: ";
-    print(jacobsthalSequence.begin(), jacobsthalSequence.end());
+    int lastIndex = 0;
     for (size_t i = 0; i < jacobsthalSequence.size(); ++i) {
         size_t index = jacobsthalSequence[i];
-        //std::cout << "Index: " << index << std::endl;
-        if (index < _pendChainVector.size()) {
-            int target = _pendChainVector[index];
-            int insertIndex = binarySearchVector(_mainChainVector, target);
-            _mainChainVector.insert(_mainChainVector.begin() + insertIndex, target);
-            //std::cout << "Inserting " << target << " at insertIndex " << insertIndex << std::endl;
-            _pendChainVector.erase(_pendChainVector.begin() + index);
+        if (index > _pendChainVector.size()) {
+            index = _pendChainVector.size() - 1;
         }
+        int target = _pendChainVector[index];
+        int insertIndex = binarySearchVector(_mainChainVector, target);
+        _mainChainVector.insert(_mainChainVector.begin() + insertIndex, target);
+        _pendChainVector.erase(_pendChainVector.begin() + index);
+        lastIndex = index + 1;
     }
 }
 
 void    PmergeMe::PmergeMeVector::mergeInsertionSortVector(char **argv) {
     getVectorFromInput(argv);
     if (_pmVector.size() < 2) {
-        throw std::invalid_argument("Not enough elements to sort");
+        throw std::invalid_argument("not enough elements to sort");
     }
-    // std::cout << "Before:  ";
-    // print(_pmVector.begin(), _pmVector.end());
     if (_pmVector.size() % 2 != 0) {
         _straggler = _pmVector.back();
         _pmVector.pop_back();
@@ -174,13 +176,15 @@ void    PmergeMe::PmergeMeVector::mergeInsertionSortVector(char **argv) {
     makePairsVector();
     mergeSortPairs(_pairsVector, 0, _pairsVector.size() - 1);
     getMainAndPendChain();
-    //std::cout << "=========" << std::endl;
-    //std::cout << "Main:  ";
-    //print(_mainChainVector.begin(), _mainChainVector.end());
-    //std::cout << "Pending:  ";
-    //print(_pendChainVector.begin(), _pendChainVector.end());
     insertInMainChain();
-    //std::cout << "=========" << std::endl;
-    std::cout << "After:  ";
+}
+
+void    PmergeMe::PmergeMeVector::printBefore() {
+    std::cout << CYAN << "Before:  " << RESET;
+    print(_pmVector.begin(), _pmVector.end());
+}
+
+void    PmergeMe::PmergeMeVector::printAfter() {
+    std::cout << GREEN << "After:  " << RESET;
     print(_mainChainVector.begin(), _mainChainVector.end());
 }

@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:03:23 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/07 12:33:31 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/08 19:27:46 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,39 +107,68 @@ void    PmergeMe::PmergeMeList::getMainAndPendChain() {
     }
 }
 
-int     PmergeMe::PmergeMeList::getJacobsthalNumber(int n) {
+int     PmergeMe::PmergeMeList::jacobsthalNumber(int n) {
     if (n == 0) {
-        return (0);
-    }
-    if (n == 1) {
         return (1);
     }
-    return (getJacobsthalNumber(n - 1) + 2 * getJacobsthalNumber(n - 2));
+    if (n == 1) {
+        return (3);
+    }
+    return (jacobsthalNumber(n - 1) + 2 * jacobsthalNumber(n - 2));
+}
+
+std::list<int>     PmergeMe::PmergeMeList::getJacobsthalSequence(int n) {
+    std::list<int> jacobsthalSeq;
+    for (int i = 0; i < n; i++) {
+        //std::cout << jacobsthalNumber(i) << std::endl;
+        jacobsthalSeq.push_back(jacobsthalNumber(i));
+        if (jacobsthalNumber(i) > n * 2) {
+            break;
+        }
+    }
+    return (jacobsthalSeq);
 }
 
 int     PmergeMe::PmergeMeList::binarySearchList(std::list<int> &lst, int target) {
-    std::list<int>::iterator it = lst.begin();
-    int start = 0;
-    int end = lst.size() - 1;
-    while (start <= end) {
-        int mid = start + (end - start) / 2;
-        std::advance(it, mid);
-        if (*it == target) {
-            return (mid);
+    std::list<int>::iterator left = lst.begin();
+    std::list<int>::iterator right = lst.end();
+    --right;
+    while (left != right) {
+        std::list<int>::iterator mid = left;
+        std::advance(mid, std::distance(left, right) / 2);
+        if (*mid == target) {
+            return (std::distance(lst.begin(), mid));
         }
-        if (*it < target) {
-            start = mid + 1;
-        } else {
-            end = mid - 1;
+        else if (*mid < target) {
+            left = ++mid;
+        }
+        else {
+            right = mid;
         }
     }
-    return (start);
+    return (std::distance(lst.begin(), left));
+}
+
+void    PmergeMe::PmergeMeList::insertInMainChain() {
+    std::list<int> jacobsthalSequence = getJacobsthalSequence(_pendChainList.size());
+    for (std::list<int>::iterator it = jacobsthalSequence.begin(); it != jacobsthalSequence.end(); ++it){
+        size_t index = std::distance(jacobsthalSequence.begin(), it);
+        if (index > _pendChainList.size())
+            index = _pendChainList.size() - 1;
+        std::list<int>::iterator pendIt = _pendChainList.begin();
+        std::advance(pendIt, index);
+        std::list<int>::iterator mainIt = _mainChainList.begin();
+        int insertIndex = binarySearchList(_mainChainList, *pendIt);
+        std::advance(mainIt, insertIndex);
+        _mainChainList.insert(mainIt, *pendIt);
+        _pendChainList.erase(pendIt);
+    }
 }
 
 void    PmergeMe::PmergeMeList::mergeInsertionSortList(char **argv) {
     getListFromInput(argv);
     if (_pmList.size() < 2)
-        return;
+        throw std::invalid_argument("not enough elements to sort");
     if (_pmList.size() % 2 != 0) {
         _straggler = _pmList.back();
         _pmList.pop_back();
@@ -147,7 +176,15 @@ void    PmergeMe::PmergeMeList::mergeInsertionSortList(char **argv) {
     makePairsList();
     mergeSortPairs(_pairsList, _pairsList.begin(), _pairsList.end());
     getMainAndPendChain();
-    // print(_mainChainList.begin(), _mainChainList.end());
-    // std::cout << "=========" << std::endl;
-    // print(_pendChainList.begin(), _pendChainList.end());
+    insertInMainChain();
+}
+
+void    PmergeMe::PmergeMeList::printBefore() {
+    std::cout << CYAN << "Before:  " << RESET;
+    print(_pmList.begin(), _pmList.end());
+}
+
+void    PmergeMe::PmergeMeList::printAfter() {
+    std::cout << GREEN << "After:  " << RESET;
+    print(_mainChainList.begin(), _mainChainList.end());
 }
