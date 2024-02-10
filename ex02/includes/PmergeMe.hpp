@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 16:11:46 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/08 18:38:46 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/10 16:55:04 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ class   PmergeMe {
                 PmergeMeVector &operator=(const PmergeMeVector &src);
                 ~PmergeMeVector();
                 
-                void    getVectorFromInput(char **argv);
-                void    mergeInsertionSortVector(char **argv);
+                bool    getVectorFromInput(char **argv);
+                void    mergeInsertionSortVector();
                 void    printBefore();
                 void    printAfter();
             private:
@@ -55,7 +55,7 @@ class   PmergeMe {
                 
                 void    makePairsVector();
                 void    mergeSortPairs(std::vector<std::pair<int, int> >& vec, int start, int end); //recursive
-                std::vector<int>     getJacobsthalSequence(int n);
+                std::vector<size_t>     getJacobsthalSequence(size_t n);
                 void    getMainAndPendChain();
                 int     binarySearchVector(std::vector<int>& vec, int target);
                 void    insertInMainChain();
@@ -68,8 +68,8 @@ class   PmergeMe {
                 PmergeMeList &operator=(const PmergeMeList &src);
                 ~PmergeMeList();
 
-                void    getListFromInput(char **argv);
-                void    mergeInsertionSortList(char **argv);
+                bool    getListFromInput(char **argv);
+                void    mergeInsertionSortList();
                 void    printBefore();
                 void    printAfter();
             private:
@@ -83,13 +83,11 @@ class   PmergeMe {
                 void    mergeSortPairs(std::list<std::pair<int, int> >& lst, std::list<std::pair<int, int> >::iterator begin,
                     std::list<std::pair<int, int> >::iterator end); //recursive
                 void    getMainAndPendChain();
-                int     jacobsthalNumber(int n);
-                std::list<int>     getJacobsthalSequence(int n);
+                size_t     jacobsthalNumber(size_t n);
+                std::list<size_t>     getJacobsthalSequence(size_t n);
                 int     binarySearchList(std::list<int>& lst, int target);
                 void    insertInMainChain();
         };
-        
-        
 };
 
 template <typename It> 
@@ -99,6 +97,20 @@ void    print(It begin, It end) {
         begin++;
     }
     std::cout << std::endl;
+};
+
+template <typename It>
+bool    hasDuplicates(It begin, It end) {
+    while (begin != end) {
+        It it = begin;
+        while (++it != end) {
+            if (*begin == *it) {
+                return (true);
+            }
+        }
+        begin++;
+    }
+    return (false);
 };
 
 #endif

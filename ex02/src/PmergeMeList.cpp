@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:03:23 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/08 19:27:46 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/10 18:53:20 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,21 +39,34 @@ PmergeMe::PmergeMeList &PmergeMe::PmergeMeList::operator=(const PmergeMeList &sr
 
 PmergeMe::PmergeMeList::~PmergeMeList() {}
 
-void    PmergeMe::PmergeMeList::getListFromInput(char **argv) {
+bool    PmergeMe::PmergeMeList::getListFromInput(char **argv) {
+    bool success = true;
     try {
+        std::list<int> tempLst;
         for (size_t i = 1; argv[i] != NULL; i++) {
             char *end;
             int num = std::strtol(argv[i], &end, 10);
             if (*end != '\0' || num < 0) {
+                success = false;
                 throw std::invalid_argument("out of range or not a number");
             }
-            _pmList.push_back(num);
+            tempLst.push_back(num);
+        }
+        if (hasDuplicates(tempLst.begin(), tempLst.end())) {
+            tempLst.clear();
+            success = false;
+            throw std::runtime_error("duplicates found");
+        }
+        else {
+            _pmList = tempLst;
+            tempLst.clear();
         }
     }
     catch (std::exception &e) {
-        std::cerr << RED << e.what() << RESET << std::endl;
-        exit(1);
+        std::cerr << RED << "Error: " << RESET << e.what()  << std::endl;
+        success = false;
     }
+    return (success);
 }
 
 void    PmergeMe::PmergeMeList::makePairsList() {
@@ -90,7 +103,7 @@ void    PmergeMe::PmergeMeList::mergeSortPairs(std::list<std::pair<int, int> >& 
                 minIt = it;
             }
         }
-        merged.splice(merged.end(), lst, minIt);
+        merged.splice(merged.end(), lst, minIt); // move the smallest to merged
     }
     lst.swap(merged);
 }
@@ -107,7 +120,7 @@ void    PmergeMe::PmergeMeList::getMainAndPendChain() {
     }
 }
 
-int     PmergeMe::PmergeMeList::jacobsthalNumber(int n) {
+size_t     PmergeMe::PmergeMeList::jacobsthalNumber(size_t n) {
     if (n == 0) {
         return (1);
     }
@@ -117,12 +130,12 @@ int     PmergeMe::PmergeMeList::jacobsthalNumber(int n) {
     return (jacobsthalNumber(n - 1) + 2 * jacobsthalNumber(n - 2));
 }
 
-std::list<int>     PmergeMe::PmergeMeList::getJacobsthalSequence(int n) {
-    std::list<int> jacobsthalSeq;
-    for (int i = 0; i < n; i++) {
-        //std::cout << jacobsthalNumber(i) << std::endl;
+std::list<size_t>     PmergeMe::PmergeMeList::getJacobsthalSequence(size_t n) {
+    std::list<size_t> jacobsthalSeq;
+    for (size_t i = 0; i < n; i++) {
+        std::cout << "jacobsthalNumber(" << i << "): " << jacobsthalNumber(i) << std::endl;
         jacobsthalSeq.push_back(jacobsthalNumber(i));
-        if (jacobsthalNumber(i) > n * 2) {
+        if (jacobsthalNumber(i) > n) {
             break;
         }
     }
@@ -150,23 +163,28 @@ int     PmergeMe::PmergeMeList::binarySearchList(std::list<int> &lst, int target
 }
 
 void    PmergeMe::PmergeMeList::insertInMainChain() {
-    std::list<int> jacobsthalSequence = getJacobsthalSequence(_pendChainList.size());
-    for (std::list<int>::iterator it = jacobsthalSequence.begin(); it != jacobsthalSequence.end(); ++it){
-        size_t index = std::distance(jacobsthalSequence.begin(), it);
+    std::list<size_t> jacobsthalSequence = getJacobsthalSequence(_pendChainList.size());
+    for (std::list<size_t>::iterator it = jacobsthalSequence.begin(); it != jacobsthalSequence.end(); ++it){
+        size_t index = *it;
         if (index > _pendChainList.size())
             index = _pendChainList.size() - 1;
         std::list<int>::iterator pendIt = _pendChainList.begin();
-        std::advance(pendIt, index);
         std::list<int>::iterator mainIt = _mainChainList.begin();
+        std::advance(pendIt, index);
         int insertIndex = binarySearchList(_mainChainList, *pendIt);
         std::advance(mainIt, insertIndex);
         _mainChainList.insert(mainIt, *pendIt);
         _pendChainList.erase(pendIt);
     }
+    for (std::list<int>::iterator pendIt = _pendChainList.begin(); pendIt != _pendChainList.end(); ++pendIt) {
+        std::list<int>::iterator insertPos = _mainChainList.begin();
+        std::advance(insertPos, std::distance(_mainChainList.begin(), std::upper_bound(_mainChainList.begin(), _mainChainList.end(), *pendIt)));
+        _mainChainList.insert(insertPos, *pendIt);
+        pendIt = _pendChainList.erase(pendIt);
+    }
 }
 
-void    PmergeMe::PmergeMeList::mergeInsertionSortList(char **argv) {
-    getListFromInput(argv);
+void    PmergeMe::PmergeMeList::mergeInsertionSortList() {
     if (_pmList.size() < 2)
         throw std::invalid_argument("not enough elements to sort");
     if (_pmList.size() % 2 != 0) {
@@ -180,11 +198,11 @@ void    PmergeMe::PmergeMeList::mergeInsertionSortList(char **argv) {
 }
 
 void    PmergeMe::PmergeMeList::printBefore() {
-    std::cout << CYAN << "Before:  " << RESET;
+    std::cout << CYAN << "List Before:  " << RESET;
     print(_pmList.begin(), _pmList.end());
 }
 
 void    PmergeMe::PmergeMeList::printAfter() {
-    std::cout << GREEN << "After:  " << RESET;
+    std::cout << GREEN << "List After:  " << RESET;
     print(_mainChainList.begin(), _mainChainList.end());
 }

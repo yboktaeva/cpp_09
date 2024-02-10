@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:02:02 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/08 19:26:39 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/10 17:50:14 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,21 +40,34 @@ PmergeMe::PmergeMeVector &PmergeMe::PmergeMeVector::operator=(const PmergeMeVect
 
 PmergeMe::PmergeMeVector::~PmergeMeVector() {}
 
-void    PmergeMe::PmergeMeVector::getVectorFromInput(char **argv) {
+bool    PmergeMe::PmergeMeVector::getVectorFromInput(char **argv) {
+    bool success = true;
     try {
+        std::vector<int> tempVec;
         for (size_t i = 1; argv[i] != NULL; i++) {
             char *end;
             int num = std::strtol(argv[i], &end, 10);
             if (*end != '\0' || num < 0) {
+                success = false;
                 throw std::invalid_argument("out of range or not a number");
-            } 
-            _pmVector.push_back(num);
+            }
+            tempVec.push_back(num);
+        }
+        if (hasDuplicates(tempVec.begin(), tempVec.end())) {
+            tempVec.clear();
+            success = false;
+            throw std::runtime_error("duplicates found");
+        }
+        else {
+            _pmVector = tempVec;
+            tempVec.clear();
         }
     }
     catch (std::exception &e) {
         std::cerr << RED << "Error: " << RESET << e.what() << std::endl;
-        exit(1);
+        success = false;
     }
+    return (success);
 }
 
 void    PmergeMe::PmergeMeVector::makePairsVector() {
@@ -62,13 +75,11 @@ void    PmergeMe::PmergeMeVector::makePairsVector() {
     size_t i = 0;
     while (size != 0) {
         _pairsVector.push_back(std::make_pair(_pmVector[i], _pmVector[i + 1]));
+        if (_pmVector[i] > _pmVector[i + 1]) {
+            std::swap(_pmVector[i], _pmVector[i + 1]); // swap if first is bigger than second
+        }
         i += 2;
         size--;
-    }
-    for (size_t i = 0; i < _pairsVector.size(); i++) {
-        if (_pairsVector[i].first > _pairsVector[i].second) {
-            std::swap(_pairsVector[i].first, _pairsVector[i].second); // swap if first is bigger than second
-        }
     }
 }
 
@@ -133,24 +144,19 @@ int    PmergeMe::PmergeMeVector::binarySearchVector(std::vector<int>& vec, int t
     return (left);
 }
 
-std::vector<int>     PmergeMe::PmergeMeVector::getJacobsthalSequence(int n) {
-    std::vector<int> jacobsthalSeq(n);
+std::vector<size_t>     PmergeMe::PmergeMeVector::getJacobsthalSequence(size_t n) {
+    std::vector<size_t> jacobsthalSeq(n);
     jacobsthalSeq[0] = 1;
     jacobsthalSeq[1] = 3;
-    for (int i = 2; i < n; i++) {
+    for (size_t i = 2; i < n; i++) {
         jacobsthalSeq[i] = jacobsthalSeq[i - 1] + 2 * jacobsthalSeq[i - 2];
-        // if (jacobsthalSeq[i] > n * 2) {
-        //     jacobsthalSeq.resize(i);
-        //     break;
-        // }
     }
     
     return (jacobsthalSeq);
 }
 
 void    PmergeMe::PmergeMeVector::insertInMainChain() {
-    std::vector<int> jacobsthalSequence = getJacobsthalSequence(_pendChainVector.size());
-    int lastIndex = 0;
+    std::vector<size_t> jacobsthalSequence = getJacobsthalSequence(_pendChainVector.size());
     for (size_t i = 0; i < jacobsthalSequence.size(); ++i) {
         size_t index = jacobsthalSequence[i];
         if (index > _pendChainVector.size()) {
@@ -160,12 +166,10 @@ void    PmergeMe::PmergeMeVector::insertInMainChain() {
         int insertIndex = binarySearchVector(_mainChainVector, target);
         _mainChainVector.insert(_mainChainVector.begin() + insertIndex, target);
         _pendChainVector.erase(_pendChainVector.begin() + index);
-        lastIndex = index + 1;
     }
 }
 
-void    PmergeMe::PmergeMeVector::mergeInsertionSortVector(char **argv) {
-    getVectorFromInput(argv);
+void    PmergeMe::PmergeMeVector::mergeInsertionSortVector() {
     if (_pmVector.size() < 2) {
         throw std::invalid_argument("not enough elements to sort");
     }
@@ -180,11 +184,11 @@ void    PmergeMe::PmergeMeVector::mergeInsertionSortVector(char **argv) {
 }
 
 void    PmergeMe::PmergeMeVector::printBefore() {
-    std::cout << CYAN << "Before:  " << RESET;
+    std::cout << CYAN << "Vector Before:  " << RESET;
     print(_pmVector.begin(), _pmVector.end());
 }
 
 void    PmergeMe::PmergeMeVector::printAfter() {
-    std::cout << GREEN << "After:  " << RESET;
+    std::cout << GREEN << "Vector After:  " << RESET;
     print(_mainChainVector.begin(), _mainChainVector.end());
 }
