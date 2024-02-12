@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 17:34:59 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/01 18:29:40 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 17:27:28 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,19 @@ int main(int argc, char **argv)
 {
     try {
         if (argc != 2)
-            throw std::invalid_argument("Wrong number of arguments");
+            throw std::invalid_argument("Wrong number of arguments.");
     }
     catch (std::exception &e) {
         std::cout << RED << "Error: " << RESET << e.what() << std::endl;
         return (1);
     }
-    RPN rpn(argv[1]);
-    rpn.getResult();
+    try {
+        RPN rpn(argv[1]);
+        rpn.getResult();
+    }
+    catch (std::exception &e) {
+        std::cout << RED << "Error: " << RESET << e.what() << std::endl;
+        return (1);
+    }
     return (0);
 }

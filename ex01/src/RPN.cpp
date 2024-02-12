@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 17:34:47 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/02 13:55:18 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 17:28:16 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,38 +38,45 @@ std::stack<int> RPN::getStack() const {
 RPN::~RPN() {}
 
 void    RPN::parseInput(std::string input) {
-    try {
-        for (int i = 0; input[i]; i++) {
-            if (!IS_NUM(input[i]) && input[i] != '+' && input[i] != '-' && input[i] != '*' && input[i] != '/' && input[i] != ' ')
-                throw std::invalid_argument("Invalid input");
-        }
-    }
-    catch (std::exception &e) {
-        std::cout << RED << "Error: " << RESET << e.what() << std::endl;
-        exit(1);
+    for (int i = 0; input[i]; i++) {
+        if (!IS_NUM(input[i]) && input[i] != '+' && input[i] != '-' && input[i] != '*' && input[i] != '/' && input[i] != ' ')
+            throw std::invalid_argument("invalid input.");
+        if (IS_NUM(input[i]) && IS_NUM(input[i + 1]))
+            throw std::invalid_argument("number too big. Max 1 digit allowed.");
     }
 }
 
 void    RPN::getResult() {
+    std::string operators = "+-*/";
     for (int i = 0; _input[i]; i++) {
         if (IS_NUM(_input[i])) {
             _stack.push(_input[i] - '0');
         }
-        else if (_input[i] == '+' || _input[i] == '-' || _input[i] == '*' || _input[i] == '/') {
+        else if (operators.find(_input[i]) != std::string::npos) {
             int a = _stack.top();
             _stack.pop();
+            if (_stack.empty())
+                throw std::invalid_argument("invalid result. Not enough numbers to operate on.");
             int b = _stack.top();
             _stack.pop();
-            if (_input[i] == '+')
+            switch (_input[i]) {
+            case '+':
                 _stack.push(a + b);
-            else if (_input[i] == '-')
+                break;
+            case '-':
                 _stack.push(b - a);
-            else if (_input[i] == '*')
+                break;
+            case '*':
                 _stack.push(a * b);
-            else if (_input[i] == '/')
+                break;
+            case '/':
+                if (a == 0)
+                    throw std::invalid_argument("division by zero.");
                 _stack.push(b / a);
+                break;
             }
+        }
     }
     _result = _stack.top();
-    std::cout << "Result: " << _result << std::endl;
+    std::cout << GREEN << "Result: " << RESET << _result << std::endl;
 }

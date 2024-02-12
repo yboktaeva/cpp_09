@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PmergeMeList.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuliaboktaeva <yuliaboktaeva@student.42    +#+  +:+       +#+        */
+/*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:03:23 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/11 20:12:19 by yuliaboktae      ###   ########.fr       */
+/*   Updated: 2024/02/12 14:46:26 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ relevant Jacobsthal numbers. Loop through the elements in ‘Pend chain’, and 
 sequence built in the previous step, use binary search to insert each ‘pend’ element into ‘Main’.
 If a ‘straggler’ was found, do a leftover loop and insertion to complete the list.*/
 
-PmergeMe::PmergeMeList::PmergeMeList() : _straggler(-1) {}
+PmergeMe::PmergeMeList::PmergeMeList() :  _pmList(), _pairsList(), _mainChainList(), _pendChainList(), _straggler(-1) {}
 
 PmergeMe::PmergeMeList::PmergeMeList(const PmergeMeList &src) {
     *this = src;
@@ -56,6 +56,16 @@ bool    PmergeMe::PmergeMeList::getListFromInput(char **argv) {
             tempLst.clear();
             success = false;
             throw std::runtime_error("duplicates found");
+        }
+        else if (tempLst.size() < 2) {
+            tempLst.clear();
+            success = false;
+            throw std::invalid_argument("not enough elements to sort");
+        }
+        else if (isSorted(tempLst.begin(), tempLst.end())) {
+            tempLst.clear();
+            success = false;
+            throw std::runtime_error("already sorted");
         }
         else {
             _pmList = tempLst;
@@ -133,9 +143,8 @@ size_t     PmergeMe::PmergeMeList::jacobsthalNumber(size_t n) {
 std::list<size_t>     PmergeMe::PmergeMeList::getJacobsthalSequence(size_t n) {
     std::list<size_t> jacobsthalSeq;
     size_t  jbIndex;
-    size_t i = 1;
+    size_t i = 3;
     while ((jbIndex = this->jacobsthalNumber(i) < n)) {
-        std::cout << "jacobsthalNumber(" << i << "): " << jacobsthalNumber(i) << std::endl;
         jacobsthalSeq.push_back(jacobsthalNumber(i));
         i++;
     }
@@ -164,8 +173,6 @@ int     PmergeMe::PmergeMeList::binarySearchList(std::list<int> &lst, int target
 
 void    PmergeMe::PmergeMeList::insertInMainChain() {
     std::list<size_t> jacobsthalSequence = getJacobsthalSequence(_pendChainList.size());
-    //_mainChainList.insert(_mainChainList.begin(), *_pendChainList.begin());
-    //_pendChainList.erase(_pendChainList.begin());
     for (std::list<size_t>::iterator it = jacobsthalSequence.begin(); it != jacobsthalSequence.end(); ++it) {
         size_t index = *it;
         if (index > _pendChainList.size())
@@ -175,35 +182,35 @@ void    PmergeMe::PmergeMeList::insertInMainChain() {
         std::advance(pendIt, index);
         int insertIndex = binarySearchList(_mainChainList, *pendIt);
         std::advance(mainIt, insertIndex);
-        //std::cout << "Insert index: " << insertIndex << " pendIt: " << *pendIt << std::endl;
         _mainChainList.insert(mainIt, *pendIt);
         _pendChainList.erase(pendIt);
     }
     for (std::list<int>::iterator pendIt = _pendChainList.begin(); pendIt != _pendChainList.end(); ++pendIt) {
-        std::list<int>::iterator insertPos = _mainChainList.begin();
-        std::advance(insertPos, std::distance(_mainChainList.begin(), std::upper_bound(_mainChainList.begin(), _mainChainList.end(), *pendIt)));
-        _mainChainList.insert(insertPos, *pendIt);
-        pendIt = _pendChainList.erase(pendIt);
-        
+        while (_pendChainList.size() != 0) {
+            std::list<int>::iterator insertPos = _mainChainList.begin();
+            std::advance(insertPos, std::distance(_mainChainList.begin(), std::upper_bound(_mainChainList.begin(), _mainChainList.end(), *pendIt)));
+            _mainChainList.insert(insertPos, *pendIt);
+            pendIt = _pendChainList.erase(pendIt);
+        }
     }
-    std::cout << "Pend size: " << _pendChainList.size() << std::endl;
-    print(_pendChainList.begin(), _pendChainList.end());
-    std::cout << "Main size: " << _mainChainList.size() << std::endl;
 }
 
 void    PmergeMe::PmergeMeList::mergeInsertionSortList() {
-    if (_pmList.size() < 2)
-        throw std::invalid_argument("not enough elements to sort");
     if (_pmList.size() % 2 != 0) {
         _straggler = _pmList.back();
         _pmList.pop_back();
     }
     makePairsList();
-    mergeSortPairs(_pairsList, _pairsList.begin(), _pairsList.end());
-    getMainAndPendChain();
-    // std::cout << "Pend chain: ";
-    // print(_pendChainList.begin(), _pendChainList.end());
-    insertInMainChain();
+    if (_pairsList.size() == 1 && _straggler == -1) {
+        _mainChainList.push_back(_pairsList.front().first);
+        _mainChainList.push_back(_pairsList.front().second);
+        return;
+    }
+    else {
+        mergeSortPairs(_pairsList, _pairsList.begin(), _pairsList.end());
+        getMainAndPendChain();
+        insertInMainChain();
+    }
 }
 
 void    PmergeMe::PmergeMeList::printBefore() {

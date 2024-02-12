@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:02:08 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/05 16:54:32 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 16:20:37 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,41 +47,34 @@ std::map<std::string, double> BitcoinExchange::readRates(std::string dataBaseNam
     }
     std::string line;
     std::getline(ifs, line);
-    try {
-        while (std::getline(ifs, line)) {
-            std::stringstream ss(line);
-            if (line.find(",") == std::string::npos)
-                throw std::runtime_error("not valid delimiter in database file. Use ','.");
-            int count = std::count(line.begin(), line.end(), ',');
-            if (count != 1)
-                throw std::runtime_error("too many delimiters in database file.");
-            std::string date;
-            std::getline(ss, date, ',');
-            struct tm tmStruct = {};
-            if (!strptime(date.c_str(), "%Y-%m-%d", &tmStruct)) {
-                throw std::runtime_error("bad input => " + date + ". Format must be YYYY-MM-DD.");
-            }
-            if (tmStruct.tm_mday < 1 || tmStruct.tm_mday > 31) {
-                throw std::runtime_error("day out of range. Day must be between 1 and 31.");
-            }
-            if (tmStruct.tm_mon < 0 || tmStruct.tm_mon > 12) {
-                throw std::runtime_error("month out of range. Month must be between 1 and 12.");
-            }
-            std::string str;
-            if (!(ss >> str))
-                throw std::runtime_error("no rate.");
-            rate = strtod(str.c_str(), &end);
-            if (rate < 0)
-                throw std::runtime_error("not a positive number.");
-            rates[date] = rate;
+    while (std::getline(ifs, line)) {
+        std::stringstream ss(line);
+        if (line.find(",") == std::string::npos)
+            throw std::runtime_error("not valid delimiter in database file. Use ','.");
+        int count = std::count(line.begin(), line.end(), ',');
+        if (count != 1)
+            throw std::runtime_error("too many delimiters in database file.");
+        std::string date;
+        std::getline(ss, date, ',');
+        struct tm tmStruct = {};
+        if (!strptime(date.c_str(), "%Y-%m-%d", &tmStruct)) {
+            throw std::runtime_error("bad input => " + date + ". Format must be YYYY-MM-DD.");
         }
-        ifs.close();
+        if (tmStruct.tm_mday < 1 || tmStruct.tm_mday > 31) {
+            throw std::runtime_error("day out of range. Day must be between 1 and 31.");
+        }
+        if (tmStruct.tm_mon < 0 || tmStruct.tm_mon > 12) {
+            throw std::runtime_error("month out of range. Month must be between 1 and 12.");
+        }
+        std::string str;
+        if (!(ss >> str))
+            throw std::runtime_error("no rate.");
+        rate = strtod(str.c_str(), &end);
+        if (rate < 0)
+            throw std::runtime_error("not a positive number.");
+        rates[date] = rate;
     }
-    catch (std::exception &e) {
-        std::cout << RED << "Error: " << RESET << e.what() << " Could not construct object."<< std::endl;
-        ifs.close();
-        exit(1);
-    }
+    ifs.close();
     return (rates);
 }
 
@@ -112,18 +105,40 @@ std::string BitcoinExchange::checkDate(std::stringstream &ss) {
     return (date);
 }
 
+bool    BitcoinExchange::isValidDigits(const std::string &str) {
+    bool dot = false;
+    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+        if (std::isdigit(*it))
+            continue;
+        if (*it == '-' && it == str.begin())
+            continue;
+        if (*it == '.' && !dot) {
+            dot = true;
+            continue;
+        }
+            return (false);
+    }
+    return (true);
+}
+
 double  BitcoinExchange::checkValue(std::stringstream &ss) {
     std::string str;
     if (!(ss >> str)) {
         throw std::runtime_error("no value.");
+    }
+    if (!isValidDigits(str)) {
+        throw std::runtime_error("not a number or bad format. Use only digits and '.'.");
     }
     double value;
     value = strtod(str.c_str(), NULL);
     if (value < 0) {
         throw std::runtime_error("not a positive number.");
     }
-    else if (value == NAN || value == INFINITY || value == -INFINITY) {
-        throw std::runtime_error("not a number.");
+    else if (value != value) {
+        throw std::runtime_error("not a number."); // NaN check
+    }
+    else if (value > std::numeric_limits<double>::infinity()) {
+        throw std::runtime_error("infinity value.");
     }
     else if (value > 1001) {
         throw std::runtime_error("too large number.");

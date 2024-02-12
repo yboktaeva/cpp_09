@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 16:11:46 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/10 16:55:04 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 14:43:13 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ class   PmergeMe {
                 void    mergeInsertionSortList();
                 void    printBefore();
                 void    printAfter();
+                size_t  jacobsthalNumber(size_t n);
             private:
                 std::list<int>    _pmList;
                 std::list<std::pair<int, int> >    _pairsList;
@@ -83,7 +84,6 @@ class   PmergeMe {
                 void    mergeSortPairs(std::list<std::pair<int, int> >& lst, std::list<std::pair<int, int> >::iterator begin,
                     std::list<std::pair<int, int> >::iterator end); //recursive
                 void    getMainAndPendChain();
-                size_t     jacobsthalNumber(size_t n);
                 std::list<size_t>     getJacobsthalSequence(size_t n);
                 int     binarySearchList(std::list<int>& lst, int target);
                 void    insertInMainChain();
@@ -111,6 +111,18 @@ bool    hasDuplicates(It begin, It end) {
         begin++;
     }
     return (false);
+};
+
+template <typename It>
+bool    isSorted(It begin, It end) {
+    It it = begin;
+    while (++it != end) {
+        if (*begin > *it) {
+            return (false);
+        }
+        begin++;
+    }
+    return (true);
 };
 
 #endif

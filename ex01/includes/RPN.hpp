@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 17:34:34 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/02 16:20:51 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 17:27:55 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define RPN_HPP
 
 # define RED "\033[1;31m"
+# define GREEN "\033[1;32m"
 # define RESET "\033[0m"
 # define IS_NUM(x) (x >= '0' && x <= '9')
 

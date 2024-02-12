@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:02:02 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/10 17:50:14 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 14:47:56 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ sequence built in the previous step, use binary search to insert each ‘pend’
 If a ‘straggler’ was found, do a leftover loop and insertion to complete the list.*/
 
 
-PmergeMe::PmergeMeVector::PmergeMeVector() : _straggler(-1) {}
+PmergeMe::PmergeMeVector::PmergeMeVector() : _pmVector(), _pairsVector(), _mainChainVector(), _pendChainVector(), _straggler(-1) {}
 
 PmergeMe::PmergeMeVector::PmergeMeVector(const PmergeMeVector &src) {
     *this = src;
@@ -58,6 +58,16 @@ bool    PmergeMe::PmergeMeVector::getVectorFromInput(char **argv) {
             success = false;
             throw std::runtime_error("duplicates found");
         }
+        else if (tempVec.size() < 2) {
+            tempVec.clear();
+            success = false;
+            throw std::invalid_argument("not enough elements to sort");
+        }
+        else if (isSorted(tempVec.begin(), tempVec.end())) {
+            tempVec.clear();
+            success = false;
+            throw std::runtime_error("already sorted");
+        }
         else {
             _pmVector = tempVec;
             tempVec.clear();
@@ -71,16 +81,17 @@ bool    PmergeMe::PmergeMeVector::getVectorFromInput(char **argv) {
 }
 
 void    PmergeMe::PmergeMeVector::makePairsVector() {
-    int size = _pmVector.size() / 2;
+    size_t size = _pmVector.size() / 2;
     size_t i = 0;
     while (size != 0) {
         _pairsVector.push_back(std::make_pair(_pmVector[i], _pmVector[i + 1]));
-        if (_pmVector[i] > _pmVector[i + 1]) {
-            std::swap(_pmVector[i], _pmVector[i + 1]); // swap if first is bigger than second
-        }
         i += 2;
         size--;
     }
+    for (size_t i = 0; i < _pairsVector.size(); i++)
+        if (_pairsVector[i].first > _pairsVector[i].second) {
+            std::swap(_pairsVector[i].first, _pairsVector[i].second); // swap if first is bigger than second
+        }
 }
 
 void    PmergeMe::PmergeMeVector::mergeSortPairs(std::vector<std::pair<int, int> >& vec, int start, int end) {
@@ -151,7 +162,6 @@ std::vector<size_t>     PmergeMe::PmergeMeVector::getJacobsthalSequence(size_t n
     for (size_t i = 2; i < n; i++) {
         jacobsthalSeq[i] = jacobsthalSeq[i - 1] + 2 * jacobsthalSeq[i - 2];
     }
-    
     return (jacobsthalSeq);
 }
 
@@ -170,17 +180,20 @@ void    PmergeMe::PmergeMeVector::insertInMainChain() {
 }
 
 void    PmergeMe::PmergeMeVector::mergeInsertionSortVector() {
-    if (_pmVector.size() < 2) {
-        throw std::invalid_argument("not enough elements to sort");
-    }
     if (_pmVector.size() % 2 != 0) {
         _straggler = _pmVector.back();
         _pmVector.pop_back();
     }
     makePairsVector();
-    mergeSortPairs(_pairsVector, 0, _pairsVector.size() - 1);
-    getMainAndPendChain();
-    insertInMainChain();
+    if (_pairsVector.size() == 1 && _straggler == -1) {
+        _mainChainVector.push_back(_pairsVector.front().first);
+        _mainChainVector.push_back(_pairsVector.front().second);
+    }
+    else {
+        mergeSortPairs(_pairsVector, 0, _pairsVector.size() - 1);
+        getMainAndPendChain();
+        insertInMainChain();
+    }
 }
 
 void    PmergeMe::PmergeMeVector::printBefore() {

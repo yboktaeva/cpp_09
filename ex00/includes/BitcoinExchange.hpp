@@ -6,7 +6,7 @@
 /*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:01:09 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/05 16:55:54 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/12 15:29:06 by yuboktae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <exception>
 # include <map>
 # include <cmath>
+# include <limits>
 
 class BitcoinExchange {
     private:
@@ -40,6 +41,7 @@ class BitcoinExchange {
         std::map<std::string, double> readRates(std::string dataBaseName);
         std::string checkDate(std::stringstream &ss);
         double checkValue(std::stringstream &ss);
+        bool    isValidDigits(const std::string &str);
         void printResult(std::string filename);
 };
 
