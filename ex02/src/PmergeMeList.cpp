@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PmergeMeList.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yuliaboktaeva <yuliaboktaeva@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 14:03:23 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/10 18:53:20 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/11 20:12:19 by yuliaboktae      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,22 +122,22 @@ void    PmergeMe::PmergeMeList::getMainAndPendChain() {
 
 size_t     PmergeMe::PmergeMeList::jacobsthalNumber(size_t n) {
     if (n == 0) {
-        return (1);
+        return (0);
     }
     if (n == 1) {
-        return (3);
+        return (1);
     }
     return (jacobsthalNumber(n - 1) + 2 * jacobsthalNumber(n - 2));
 }
 
 std::list<size_t>     PmergeMe::PmergeMeList::getJacobsthalSequence(size_t n) {
     std::list<size_t> jacobsthalSeq;
-    for (size_t i = 0; i < n; i++) {
+    size_t  jbIndex;
+    size_t i = 1;
+    while ((jbIndex = this->jacobsthalNumber(i) < n)) {
         std::cout << "jacobsthalNumber(" << i << "): " << jacobsthalNumber(i) << std::endl;
         jacobsthalSeq.push_back(jacobsthalNumber(i));
-        if (jacobsthalNumber(i) > n) {
-            break;
-        }
+        i++;
     }
     return (jacobsthalSeq);
 }
@@ -164,7 +164,9 @@ int     PmergeMe::PmergeMeList::binarySearchList(std::list<int> &lst, int target
 
 void    PmergeMe::PmergeMeList::insertInMainChain() {
     std::list<size_t> jacobsthalSequence = getJacobsthalSequence(_pendChainList.size());
-    for (std::list<size_t>::iterator it = jacobsthalSequence.begin(); it != jacobsthalSequence.end(); ++it){
+    //_mainChainList.insert(_mainChainList.begin(), *_pendChainList.begin());
+    //_pendChainList.erase(_pendChainList.begin());
+    for (std::list<size_t>::iterator it = jacobsthalSequence.begin(); it != jacobsthalSequence.end(); ++it) {
         size_t index = *it;
         if (index > _pendChainList.size())
             index = _pendChainList.size() - 1;
@@ -173,6 +175,7 @@ void    PmergeMe::PmergeMeList::insertInMainChain() {
         std::advance(pendIt, index);
         int insertIndex = binarySearchList(_mainChainList, *pendIt);
         std::advance(mainIt, insertIndex);
+        //std::cout << "Insert index: " << insertIndex << " pendIt: " << *pendIt << std::endl;
         _mainChainList.insert(mainIt, *pendIt);
         _pendChainList.erase(pendIt);
     }
@@ -181,7 +184,11 @@ void    PmergeMe::PmergeMeList::insertInMainChain() {
         std::advance(insertPos, std::distance(_mainChainList.begin(), std::upper_bound(_mainChainList.begin(), _mainChainList.end(), *pendIt)));
         _mainChainList.insert(insertPos, *pendIt);
         pendIt = _pendChainList.erase(pendIt);
+        
     }
+    std::cout << "Pend size: " << _pendChainList.size() << std::endl;
+    print(_pendChainList.begin(), _pendChainList.end());
+    std::cout << "Main size: " << _mainChainList.size() << std::endl;
 }
 
 void    PmergeMe::PmergeMeList::mergeInsertionSortList() {
@@ -194,6 +201,8 @@ void    PmergeMe::PmergeMeList::mergeInsertionSortList() {
     makePairsList();
     mergeSortPairs(_pairsList, _pairsList.begin(), _pairsList.end());
     getMainAndPendChain();
+    // std::cout << "Pend chain: ";
+    // print(_pendChainList.begin(), _pendChainList.end());
     insertInMainChain();
 }
 

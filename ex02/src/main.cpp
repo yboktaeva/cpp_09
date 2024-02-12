@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuboktae <yuboktae@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yuliaboktaeva <yuliaboktaeva@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 16:14:38 by yuboktae          #+#    #+#             */
-/*   Updated: 2024/02/10 17:55:51 by yuboktae         ###   ########.fr       */
+/*   Updated: 2024/02/11 19:17:00 by yuliaboktae      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int main(int argc, char **argv) {
     try {
         if (argc < 2) {
-            throw std::invalid_argument("usage: ./PmergeMe 2 1 5 4 3 etc...");
+            throw std::invalid_argument("too few arguments");
         }
     } catch (std::exception &e) {
         std::cerr << RED << "Error: " << RESET << e.what() << std::endl;
